@@ -4,7 +4,7 @@ import atexit
 import os
 import json
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__)
 
 db_name = 'mydb'
 client = None
@@ -39,50 +39,40 @@ elif os.path.isfile('vcap-local.json'):
 port = int(os.getenv('PORT', 8000))
 
 @app.route('/')
-def root():
-    return app.send_static_file('index.html')
+def home():
+    return render_template('index.html')  # render a template
 
-# /* Endpoint to greet and add a new visitor to database.
-# * Send a POST request to localhost:8000/api/visitors with body
-# * {
-# *     "name": "Bob"
-# * }
-# */
-@app.route('/api/visitors', methods=['GET'])
-def get_visitor():
-    if client:
-        return jsonify(list(map(lambda doc: doc['name'], db)))
-    else:
-        print('No database')
-        return jsonify([])
+@app.route('/HA/login')
+def ha_login():
+    return render_template('/HA/login.html')  # render a template
 
-# /**
-#  * Endpoint to get a JSON array of all the visitors in the database
-#  * REST API example:
-#  * <code>
-#  * GET http://localhost:8000/api/visitors
-#  * </code>
-#  *
-#  * Response:
-#  * [ "Bob", "Jane" ]
-#  * @return An array of all the visitor names
-#  */
-@app.route('/api/visitors', methods=['POST'])
-def put_visitor():
-    user = request.json['name']
-    data = {'name':user}
-    if client:
-        my_document = db.create_document(data)
-        data['_id'] = my_document['_id']
-        return jsonify(data)
-    else:
-        print('No database')
-        return jsonify(data)
+@app.route('/HA/dashboard')
+def ha_dashboard():
+    return render_template('/HA/dashboard.html')  # render a template
 
-@atexit.register
-def shutdown():
-    if client:
-        client.disconnect()
+@app.route('/HA/review')
+def ha_review():
+    return render_template('/HA/review.html')  # render a template
+
+@app.route('/HA/allocate')
+def ha_allocate():
+    return render_template('/HA/allocate.html')  # render a template
+
+@app.route('/HCP/login')
+def hcp_login():
+    return render_template('/HCP/login.html')  # render a template
+
+@app.route('/HCP/dashboard')
+def hcp_dashboard():
+    return render_template('/HCP/dashboard.html')  # render a template
+
+@app.route('/HCP/addpatient')
+def hcp_addpatient():
+    return render_template('/HCP/addpatient.html')  # render a template
+
+@app.route('/HCP/transferpatient')
+def hcp_transferpatient():
+    return render_template('/HCP/transferpatient.html')  # render a template
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True)
